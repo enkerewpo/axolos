@@ -1,4 +1,4 @@
-axolotl os
+axolos
 
 yet another linux distribution
 

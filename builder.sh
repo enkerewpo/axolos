@@ -4,7 +4,7 @@
 ARCH=amd64
 HOST_ARCH=$(uname -m)
 OUTPUT_DIR=output
-ISO_NAME=axolotl-os-$ARCH.iso
+ISO_NAME=axolos-$ARCH.iso
 
 LINUX_KERNEL_TARBALL_DL_URL=https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.8.6.tar.xz
 LINUX_KERNEL_VERSION="6.8.6"
