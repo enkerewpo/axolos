@@ -52,12 +52,20 @@ build_kernel() {
         cp $LINUX_KERNEL_SRC_DIR/arch/x86/boot/bzImage $OUTPUT_DIR"/kernel/bzImage"
         cp $LINUX_KERNEL_SRC_DIR/System.map $OUTPUT_DIR"/kernel/System.map"
         cp $LINUX_KERNEL_SRC_DIR/.config $OUTPUT_DIR"/kernel/.config"
-        # create the iso with grub
-        mkdir -p $OUTPUT_DIR"/iso"
-        cp $OUTPUT_DIR"/kernel/bzImage" $OUTPUT_DIR"/iso"
     else
         echo "Unsupported architecture for now: $ARCH"
     fi
+}
+
+build_iso() {
+    echo "Building iso for $ARCH"
+    # create the iso with grub
+    mkdir -p $OUTPUT_DIR"/iso/boot/grub"
+    cp $OUTPUT_DIR"/kernel/bzImage" $OUTPUT_DIR"/iso"
+    cp $OUTPUT_DIR"/rootfs.cpio.gz" $OUTPUT_DIR"/iso"
+    cp grub.cfg $OUTPUT_DIR"/iso/boot/grub"
+    grub-mkrescue -o $OUTPUT_DIR"/"$ISO_NAME $OUTPUT_DIR"/iso"
+    echo "Finished building iso for $ARCH"
 }
 
 build_world() {
@@ -77,6 +85,7 @@ build_world() {
     # the folder name is linux-$LINUX_KERNEL_VERSION under kernel directory
     build_rootfs
     build_kernel
+    build_iso
     echo "Finished building world for $ARCH"
 }
 
