@@ -10,6 +10,8 @@ LINUX_KERNEL_TARBALL_DL_URL=https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6
 LINUX_KERNEL_VERSION="6.8.6"
 LINUX_KERNEL_SRC_DIR=$OUTPUT_DIR"/kernel/linux-$LINUX_KERNEL_VERSION"
 
+PKG_AUTO_BUILD=$OUTPUT_DIR"/axolospkg"
+
 # check whether the script is running on a amd64 machine, otherwise exit
 if [ $HOST_ARCH != "x86_64" ]; then
     echo "This script is only supported on amd64 machines"
@@ -18,20 +20,26 @@ fi
 
 build_rootfs() {
     echo "Building rootfs for $ARCH"
-    # just add a txt file for now
+    rm -rf $OUTPUT_DIR"/rootfs"
     mkdir -p $OUTPUT_DIR"/rootfs"
     echo "Hello, this is axolotl os" >$OUTPUT_DIR"/rootfs/README.txt"
-    # compile init.c and add it to rootfs
-    gcc -static -o $OUTPUT_DIR"/rootfs/init" init.c
+    cd src/axolospkg
+    cargo build --release
+    cp target/release/axolospkg ../../$OUTPUT_DIR"/axolospkg"
+    cd ../..
+    # run the auto build
+    gcc init.c -o $OUTPUT_DIR"/rootfs/init"
+    $PKG_AUTO_BUILD -i pkg.list -o $OUTPUT_DIR -p packages
     # now let create the dev structure
     mkdir -p $OUTPUT_DIR"/rootfs/dev"
-    sudo mknod -m 666 $OUTPUT_DIR"/rootfs/dev/null" c 1 3
-    sudo mknod -m 666 $OUTPUT_DIR"/rootfs/dev/tty c" 5 0
-    sudo mknod -m 666 $OUTPUT_DIR"/rootfs/dev/zero" c 1 5
-    sudo mknod -m 666 $OUTPUT_DIR"/rootfs/dev/random" c 1 8
-    sudo mknod -m 666 $OUTPUT_DIR"/rootfs/dev/urandom" c 1 9
+    mknod -m 666 $OUTPUT_DIR"/rootfs/dev/null" c 1 3
+    mknod -m 666 $OUTPUT_DIR"/rootfs/dev/tty c" 5 0
+    mknod -m 666 $OUTPUT_DIR"/rootfs/dev/zero" c 1 5
+    mknod -m 666 $OUTPUT_DIR"/rootfs/dev/random" c 1 8
+    mknod -m 666 $OUTPUT_DIR"/rootfs/dev/urandom" c 1 9
     # console
-    sudo mknod -m 600 $OUTPUT_DIR"/rootfs/dev/console" c 5 1
+    mknod -m 600 $OUTPUT_DIR"/rootfs/dev/console" c 5 1
+    cp -r lib/* $OUTPUT_DIR"/rootfs"
     cd $OUTPUT_DIR"/rootfs"
     find . | cpio -H newc -o >../rootfs.cpio
     cd ..

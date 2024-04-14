@@ -1,0 +1,9 @@
+PACKAGE_NAME                ::=     zsh
+PACKAGE_VERSION             ::=     5.9
+PACKAGE_SRC                 ::=     https://www.zsh.org/pub/zsh-{{PACKAGE_VERSION}}.tar.xz
+PACKAGE_INFO_MAINTAINER     ::=     wheatfox(enkerewpo@hotmail.com)
+PACKAGE_BUILD_ROOT          ::=     ./zsh-{{PACKAGE_VERSION}}
+PACKAGE_BUILD_DEPENDS       ::=     ncurses
+PACKAGE_DL_FILENAME         ::=     zsh-{{PACKAGE_VERSION}}.tar.xz
+PACKAGE_BUILD_CMD           ::=     ./configure && make -j4
+TARGET_PROG                 ::=     ./Src/zsh
